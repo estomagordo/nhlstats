@@ -128,7 +128,7 @@ def main():
             print(f'No {season} season directory found for {b}. Creating it now.')
             os.makedirs(f'seasons/{season}/{b}')
 
-        with open(f'seasons/{season}/{a}/{id}.json', 'w') as g:
+        with open(f'seasons/{season}/{b}/{id}.json', 'w') as g:
             g.write(json.dumps(play_by_play))
 
         if file_count(f'seasons/{season}/{b}/') == GAMES_IN_SEASON_PER_TEAM:
