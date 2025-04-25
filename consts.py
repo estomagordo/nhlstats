@@ -1,6 +1,5 @@
 TEAMS = [
     'ANA',
-    'ARI',
     'BOS',
     'BUF',
     'CAR',
@@ -33,3 +32,5 @@ TEAMS = [
     'WPG',
     'WSH',
 ]
+
+GAMES_IN_SEASON_PER_TEAM = 82

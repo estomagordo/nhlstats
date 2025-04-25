@@ -4,9 +4,13 @@ import re
 import requests
 
 from argparse import ArgumentParser
+from pathlib import Path
 
-from consts import TEAMS
+from consts import GAMES_IN_SEASON_PER_TEAM, TEAMS
 
+
+DONE = '.done'
+GAMES = 'games'
 
 def play_by_play_url(game_id):
     return f'https://api-web.nhle.com/v1/gamecenter/{game_id}/play-by-play'
@@ -20,6 +24,39 @@ def validate_season_format(season):
     EIGHT_DIGITS = '\d{8}'
 
     return re.match(EIGHT_DIGITS, season) is not None
+
+
+def get_play_by_play(id):
+    request = requests.get(play_by_play_url(id))
+
+    return json.loads(request.content)
+
+
+def games_for_season_team(season, team):
+    request = requests.get(club_schedule_season(team, season))
+
+    data = json.loads(request.content)
+    games = []
+
+    for game in data['games']:
+        home = game['homeTeam']['abbrev']
+        away = game['awayTeam']['abbrev']
+        id = game['id']
+
+        games.append((id, home if home != team else away))
+
+    return games
+
+
+def file_count(path):
+    count = 0
+
+    for name in os.listdir(path):
+        if os.path.isfile(os.path.join(path, name)):
+            count += 1
+
+    return count
+
 
 def main():
     ap = ArgumentParser()
@@ -39,14 +76,54 @@ def main():
         print(f'No season directory for season {season}. Creating it now.')
         os.makedirs(f'seasons/{season}')
 
+    if os.path.isfile(f'seasons/{season}/{DONE}'):
+        print('Season already done. Exiting.')
+        return
+    
+    if not os.path.isfile(f'seasons/{season}/{GAMES}'):
+        print(f'No games log for season {season}. Creating.')
+        Path.touch(f'seasons/{season}/{GAMES}')
+
+    games_saved = set()
+
+    with open(f'seasons/{season}/{GAMES}') as f:
+        for line in f:
+            games_saved.add(line.rstrip())
+
     for team in TEAMS:
+        retrieved = []
+
         if not os.path.isdir(f'seasons/{season}/{team}'):
             print(f'No {season} season directory found for {team}. Creating it now.')
             os.makedirs(f'seasons/{season}/{team}')
 
-        if not os.path.isfile(f'seasons/{season}/{team}/.done'):
-            for game in games_for_season_team(season, team):
-                # should keep track of game ids already downloaded. Easy peasy.
+        if not os.path.isfile(f'seasons/{season}/{team}/{DONE}'):
+            for id, opponent in games_for_season_team(season, team):
+                if id in games_saved:
+                    continue
+
+                play_by_play = get_play_by_play(id)
+                retrieved.append((team, opponent, id, play_by_play))
+
+        for a, b, id, play_by_play in retrieved:
+            with open(f'seasons/{season}/{a}/{id}.json', 'w') as g:
+                g.write(play_by_play)
+
+            if not os.path.isdir(f'seasons/{season}/{b}'):
+                print(f'No {season} season directory found for {b}. Creating it now.')
+                os.makedirs(f'seasons/{season}/{b}')
+
+            with open(f'seasons/{season}/{a}/{id}.json', 'w') as g:
+                g.write(play_by_play)
+
+            if file_count(f'seaons/{season}/{b}/') == GAMES_IN_SEASON_PER_TEAM:
+                Path.touch(f'seasons/{season}/{b}/{DONE}')
+
+        if file_count(f'seaons/{season}/{team}/') == GAMES_IN_SEASON_PER_TEAM:
+                Path.touch(f'seasons/{season}/{team}/{DONE}')
+
+        if all(os.path.isfile(f'seasons/{season}/{team_name}/{DONE}') for team_name in TEAMS):
+            Path.touch(f'seasons/{season}/{DONE}')
 
 
 if __name__ == '__main__':
