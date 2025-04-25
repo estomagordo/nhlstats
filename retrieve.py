@@ -20,6 +20,14 @@ def club_schedule_season(team, season):
     return f'https://api-web.nhle.com/v1/club-schedule-season/{team}/{season}'
 
 
+def get(url):
+    print(f'Making a GET request to {url}')
+    request = requests.get(url)
+    print(f'Status code is {request.status_code}')
+
+    return request.content
+
+
 def validate_season_format(season):
     EIGHT_DIGITS = '\d{8}'
 
@@ -27,15 +35,15 @@ def validate_season_format(season):
 
 
 def get_play_by_play(id):
-    request = requests.get(play_by_play_url(id))
+    content = get(play_by_play_url(id))
 
-    return json.loads(request.content)
+    return json.loads(content)
 
 
 def games_for_season_team(season, team):
-    request = requests.get(club_schedule_season(team, season))
+    content = get(club_schedule_season(team, season))
 
-    data = json.loads(request.content)
+    data = json.loads(content)
     games = []
 
     for game in data['games']:
@@ -107,23 +115,28 @@ def main():
 
         for a, b, id, play_by_play in retrieved:
             with open(f'seasons/{season}/{a}/{id}.json', 'w') as g:
-                g.write(play_by_play)
+                g.write(json.dumps(play_by_play))
 
             if not os.path.isdir(f'seasons/{season}/{b}'):
                 print(f'No {season} season directory found for {b}. Creating it now.')
                 os.makedirs(f'seasons/{season}/{b}')
 
             with open(f'seasons/{season}/{a}/{id}.json', 'w') as g:
-                g.write(play_by_play)
+                g.write(json.dumps(play_by_play))
 
             if file_count(f'seaons/{season}/{b}/') == GAMES_IN_SEASON_PER_TEAM:
                 Path.touch(f'seasons/{season}/{b}/{DONE}')
+
+            games_saved.add(id)
 
         if file_count(f'seaons/{season}/{team}/') == GAMES_IN_SEASON_PER_TEAM:
                 Path.touch(f'seasons/{season}/{team}/{DONE}')
 
         if all(os.path.isfile(f'seasons/{season}/{team_name}/{DONE}') for team_name in TEAMS):
             Path.touch(f'seasons/{season}/{DONE}')
+
+        with open(f'seasons/{season}/{GAMES}', 'w') as g:
+            g.write('\n'.join(id for id in games_saved))
 
 
 if __name__ == '__main__':
