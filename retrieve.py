@@ -50,8 +50,10 @@ def games_for_season_team(season, team):
         home = game['homeTeam']['abbrev']
         away = game['awayTeam']['abbrev']
         id = game['id']
+        game_type = game['gameType']
 
-        games.append((id, home if home != team else away))
+        if game_type == 2:
+            games.append((id, home if home != team else away))
 
     return games
 
