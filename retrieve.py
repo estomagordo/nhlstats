@@ -124,12 +124,12 @@ def main():
             with open(f'seasons/{season}/{a}/{id}.json', 'w') as g:
                 g.write(json.dumps(play_by_play))
 
-            if file_count(f'seaons/{season}/{b}/') == GAMES_IN_SEASON_PER_TEAM:
+            if file_count(f'seasons/{season}/{b}/') == GAMES_IN_SEASON_PER_TEAM:
                 Path.touch(f'seasons/{season}/{b}/{DONE}')
 
             games_saved.add(id)
 
-        if file_count(f'seaons/{season}/{team}/') == GAMES_IN_SEASON_PER_TEAM:
+        if file_count(f'seasons/{season}/{team}/') == GAMES_IN_SEASON_PER_TEAM:
                 Path.touch(f'seasons/{season}/{team}/{DONE}')
 
         if all(os.path.isfile(f'seasons/{season}/{team_name}/{DONE}') for team_name in TEAMS):
