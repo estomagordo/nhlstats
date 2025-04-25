@@ -136,7 +136,7 @@ def main():
             Path.touch(f'seasons/{season}/{DONE}')
 
         with open(f'seasons/{season}/{GAMES}', 'w') as g:
-            g.write('\n'.join(id for id in games_saved))
+            g.write('\n'.join(str(id) for id in games_saved))
 
 
 if __name__ == '__main__':
