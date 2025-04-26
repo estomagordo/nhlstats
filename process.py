@@ -8,6 +8,9 @@ def process_file(file_name):
     with open(file_name) as f:
         data = json.loads(f.readline())
 
+        if data['homeTeam']['abbrev'] > data['awayTeam']['abbrev']:
+            return (False, -1, -1)
+
         home = 0
         away = 0
         lead_minute = -1
