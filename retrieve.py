@@ -71,18 +71,18 @@ def file_count(path):
 def main():
     ap = ArgumentParser()
     ap.add_argument('-s', '--season')
-    ap.add_argument('-t', '--team')
+    # ap.add_argument('-t', '--team')
 
     season = ap.parse_args().season
-    team = ap.parse_args().team
+    # team = ap.parse_args().team
 
     if not validate_season_format(season):
         print('Invalid season format')
         return
     
-    if not team in TEAMS:
-        print('Unknown team')
-        return
+    # if not team in TEAMS:
+    #     print('Unknown team')
+    #     return
     
     if not os.path.isdir('seasons'):
         print('No seasons directory. Creating it now.')
@@ -105,45 +105,46 @@ def main():
     with open(f'seasons/{season}/{GAMES}') as f:
         for line in f:
             games_saved.add(line.rstrip())
-    
-    retrieved = []
 
-    if not os.path.isdir(f'seasons/{season}/{team}'):
-        print(f'No {season} season directory found for {team}. Creating it now.')
-        os.makedirs(f'seasons/{season}/{team}')
+    for team in TEAMS:
+        retrieved = []
 
-    if not os.path.isfile(f'seasons/{season}/{team}/{DONE}'):
-        for id, opponent in games_for_season_team(season, team):
-            if id in games_saved:
-                continue
+        if not os.path.isdir(f'seasons/{season}/{team}'):
+            print(f'No {season} season directory found for {team}. Creating it now.')
+            os.makedirs(f'seasons/{season}/{team}')
 
-            play_by_play = get_play_by_play(id)
-            retrieved.append((team, opponent, id, play_by_play))
+        if not os.path.isfile(f'seasons/{season}/{team}/{DONE}'):
+            for id, opponent in games_for_season_team(season, team):
+                if id in games_saved:
+                    continue
 
-    for a, b, id, play_by_play in retrieved:
-        with open(f'seasons/{season}/{a}/{id}.json', 'w') as g:
-            g.write(json.dumps(play_by_play))
+                play_by_play = get_play_by_play(id)
+                retrieved.append((team, opponent, id, play_by_play))
 
-        if not os.path.isdir(f'seasons/{season}/{b}'):
-            print(f'No {season} season directory found for {b}. Creating it now.')
-            os.makedirs(f'seasons/{season}/{b}')
+        for a, b, id, play_by_play in retrieved:
+            with open(f'seasons/{season}/{a}/{id}.json', 'w') as g:
+                g.write(json.dumps(play_by_play))
 
-        with open(f'seasons/{season}/{b}/{id}.json', 'w') as g:
-            g.write(json.dumps(play_by_play))
+            if not os.path.isdir(f'seasons/{season}/{b}'):
+                print(f'No {season} season directory found for {b}. Creating it now.')
+                os.makedirs(f'seasons/{season}/{b}')
 
-        if file_count(f'seasons/{season}/{b}/') == GAMES_IN_SEASON_PER_TEAM:
-            Path.touch(f'seasons/{season}/{b}/{DONE}')
+            with open(f'seasons/{season}/{b}/{id}.json', 'w') as g:
+                g.write(json.dumps(play_by_play))
 
-        games_saved.add(id)
+            if file_count(f'seasons/{season}/{b}/') == GAMES_IN_SEASON_PER_TEAM:
+                Path.touch(f'seasons/{season}/{b}/{DONE}')
 
-    if file_count(f'seasons/{season}/{team}/') == GAMES_IN_SEASON_PER_TEAM:
-        Path.touch(f'seasons/{season}/{team}/{DONE}')
+            games_saved.add(id)
 
-    if all(os.path.isfile(f'seasons/{season}/{team_name}/{DONE}') for team_name in TEAMS):
-        Path.touch(f'seasons/{season}/{DONE}')
+        if file_count(f'seasons/{season}/{team}/') == GAMES_IN_SEASON_PER_TEAM:
+            Path.touch(f'seasons/{season}/{team}/{DONE}')
 
-    with open(f'seasons/{season}/{GAMES}', 'w') as g:
-        g.write('\n'.join(str(id) for id in games_saved))
+        if all(os.path.isfile(f'seasons/{season}/{team_name}/{DONE}') for team_name in TEAMS):
+            Path.touch(f'seasons/{season}/{DONE}')
+
+        with open(f'seasons/{season}/{GAMES}', 'w') as g:
+            g.write('\n'.join(str(id) for id in games_saved))
 
 
 if __name__ == '__main__':
