@@ -71,18 +71,12 @@ def file_count(path):
 def main():
     ap = ArgumentParser()
     ap.add_argument('-s', '--season')
-    # ap.add_argument('-t', '--team')
 
     season = ap.parse_args().season
-    # team = ap.parse_args().team
 
     if not validate_season_format(season):
         print('Invalid season format')
         return
-    
-    # if not team in TEAMS:
-    #     print('Unknown team')
-    #     return
     
     if not os.path.isdir('seasons'):
         print('No seasons directory. Creating it now.')
@@ -107,6 +101,9 @@ def main():
             games_saved.add(line.rstrip())
 
     for team in TEAMS:
+        if team == 'UTA' and season != '20242025':
+            team = 'ARI'
+            
         retrieved = []
 
         if not os.path.isdir(f'seasons/{season}/{team}'):

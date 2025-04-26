@@ -1,15 +1,10 @@
 import json
 import os
 
-from collections import Counter, defaultdict
-
 
 def process_file(file_name):
     with open(file_name) as f:
         data = json.loads(f.readline())
-
-        if data['homeTeam']['abbrev'] > data['awayTeam']['abbrev']:
-            return (False, -1, -1)
 
         home = 0
         away = 0
@@ -50,30 +45,18 @@ def process_file(file_name):
 def main():
     minutes = [[0, 0, 0] for _ in range(20)]
     processed = set()
-    duplicates = defaultdict(list)
 
-    def walk(root):
-        for path, dirs, files in os.walk(root):
-            for file in files:
-                if file.endswith('.json'):
-                    duplicates[file].append(path)
+    for path, _, files in os.walk('seasons/'):
+        for file in files:
+            if file.endswith('.json'):
+                if file in processed:
+                    continue
 
-                    if file in processed:
-                        continue
+                processed.add(file)
+                succcess, result, lead_minute = process_file(os.path.join(path, file))
 
-                    processed.add(file)
-                    succcess, result, lead_minute = process_file(os.path.join(path, file))
-
-                    if succcess:
-                        minutes[lead_minute][result] += 1
-
-            for directory in dirs:
-                walk(os.path.join(path, directory))
-
-    walk('seasons/')
-
-    for file, l in duplicates.items():
-        print(file, l)
+                if succcess:
+                    minutes[lead_minute][result] += 1
 
     for i, minute in enumerate(minutes):
         print(i, minute)
