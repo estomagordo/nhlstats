@@ -28,7 +28,7 @@ def get(url):
 
 
 def validate_season_format(season):
-    EIGHT_DIGITS = '\d{8}'
+    EIGHT_DIGITS = r'\d{8}'
 
     return re.match(EIGHT_DIGITS, season) is not None
 

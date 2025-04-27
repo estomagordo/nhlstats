@@ -40,7 +40,7 @@ def teams_for_season(season):
     if season == '20242025':
         return CURRENT_TEAMS
     elif season in ('20232024', '20222023', '20212022'):
-        utaind = CURRENT_TEAMS.find('UTA')
+        utaind = CURRENT_TEAMS.index('UTA')
         return sorted(CURRENT_TEAMS[:utaind] + CURRENT_TEAMS[utaind+1:] + ['ARI'])
     else:
         raise ValueError('Unknown or unsupported season!')
