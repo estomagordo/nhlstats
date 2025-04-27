@@ -6,8 +6,7 @@ import requests
 from argparse import ArgumentParser
 from pathlib import Path
 
-from consts import GAMES_IN_SEASON_PER_TEAM, TEAMS
-
+from consts import teams_for_season, GAMES_IN_SEASON_PER_TEAM
 
 DONE = '.done'
 GAMES = 'games'
@@ -74,6 +73,8 @@ def main():
 
     season = ap.parse_args().season
 
+    teams = teams_for_season(season)
+
     if not validate_season_format(season):
         print('Invalid season format')
         return
@@ -100,10 +101,7 @@ def main():
         for line in f:
             games_saved.add(line.rstrip())
 
-    for team in TEAMS:
-        if team == 'UTA' and season != '20242025':
-            team = 'ARI'
-            
+    for team in teams:
         retrieved = []
 
         if not os.path.isdir(f'seasons/{season}/{team}'):
@@ -137,7 +135,7 @@ def main():
         if file_count(f'seasons/{season}/{team}/') == GAMES_IN_SEASON_PER_TEAM:
             Path.touch(f'seasons/{season}/{team}/{DONE}')
 
-        if all(os.path.isfile(f'seasons/{season}/{team_name}/{DONE}') for team_name in TEAMS):
+        if all(os.path.isfile(f'seasons/{season}/{team_name}/{DONE}') for team_name in teams):
             Path.touch(f'seasons/{season}/{DONE}')
 
         with open(f'seasons/{season}/{GAMES}', 'w') as g:
