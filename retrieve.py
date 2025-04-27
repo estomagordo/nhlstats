@@ -11,6 +11,7 @@ from consts import teams_for_season, GAMES_IN_SEASON_PER_TEAM
 DONE = '.done'
 GAMES = 'games'
 
+
 def play_by_play_url(game_id):
     return f'https://api-web.nhle.com/v1/gamecenter/{game_id}/play-by-play'
 

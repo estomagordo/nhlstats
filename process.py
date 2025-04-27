@@ -61,6 +61,8 @@ def main():
     for i, minute in enumerate(minutes):
         print(i, minute)
 
+    print('total', [sum(minute[i] for minute in minutes) for i in range(3)])
+
 
 if __name__ == '__main__':
     main()
