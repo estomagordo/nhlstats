@@ -1,6 +1,13 @@
 import json
 import os
 
+from matplotlib import pyplot
+
+NHL_WIN_POINTS = 2
+SHL_WIN_POINTS = 3
+NHL_DRAW_VALUE = 0.75
+SHL_DRAW_VALUE = 0.5
+
 
 def process_file(file_name):
     with open(file_name) as f:
@@ -62,6 +69,22 @@ def print_stats(minutes):
     losses = sum(minute[2] for minute in minutes)
 
     print(f'Total: {print_minute([wins, draws, losses])}')
+
+    totals = [sum(minute) for minute in minutes]
+    times = [m for m in range(1, 21)]
+    win_percentages = [minutes[i][0]/totals[i] for i in range(20)]
+    draw_percentages = [minutes[i][1]/totals[i] for i in range(20)]
+    loss_percentages = [minutes[i][2]/totals[i] for i in range(20)]
+    nhl_weighted_point_percentages = [NHL_WIN_POINTS * (minutes[i][0] + minutes[i][1] * NHL_DRAW_VALUE) /totals[i] for i in range(20)]
+    shl_weighted_point_percentages = [SHL_WIN_POINTS * (minutes[i][0] + minutes[i][1] * SHL_DRAW_VALUE) /totals[i] for i in range(20)]
+
+    pyplot.plot(times, win_percentages, label='Likelihood of winning')
+    pyplot.plot(times, draw_percentages, label='Likelihood of regulation drawing')
+    pyplot.plot(times, loss_percentages, label='Likelihood of losing')
+    pyplot.plot(times, nhl_weighted_point_percentages, label='Weighted points NHL')
+    pyplot.plot(times, shl_weighted_point_percentages, label='Weighted points SHL')
+    pyplot.legend()
+    pyplot.show()
 
 def main():
     minutes = [[0, 0, 0] for _ in range(20)]
