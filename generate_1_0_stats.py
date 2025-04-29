@@ -83,6 +83,7 @@ def print_stats(minutes):
     pyplot.plot(times, loss_percentages, label='Likelihood of losing')
     pyplot.plot(times, nhl_weighted_point_percentages, label='Weighted points NHL')
     pyplot.plot(times, shl_weighted_point_percentages, label='Weighted points SHL')
+    pyplot.xticks(times)
     pyplot.legend()
     pyplot.show()
 
