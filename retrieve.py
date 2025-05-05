@@ -6,7 +6,7 @@ import requests
 from argparse import ArgumentParser
 from pathlib import Path
 
-from consts import teams_for_season, GAMES_IN_SEASON_PER_TEAM
+from season import Season
 
 DONE = '.done'
 GAMES = 'games'
@@ -72,11 +72,9 @@ def main():
     ap = ArgumentParser()
     ap.add_argument('-s', '--season')
 
-    season = ap.parse_args().season
+    season_name = ap.parse_args().season
 
-    teams = teams_for_season(season)
-
-    if not validate_season_format(season):
+    if not validate_season_format(season_name):
         print('Invalid season format')
         return
     
@@ -84,25 +82,27 @@ def main():
         print('No seasons directory. Creating it now.')
         os.makedirs('seasons')
 
-    if not os.path.isdir(f'seasons/{season}'):
-        print(f'No season directory for season {season}. Creating it now.')
-        os.makedirs(f'seasons/{season}')
+    if not os.path.isdir(f'seasons/{season_name}'):
+        print(f'No season directory for season {season_name}. Creating it now.')
+        os.makedirs(f'seasons/{season_name}')
 
-    if os.path.isfile(f'seasons/{season}/{DONE}'):
+    if os.path.isfile(f'seasons/{season_name}/{DONE}'):
         print('Season already done. Exiting.')
         return
     
-    if not os.path.isfile(f'seasons/{season}/{GAMES}'):
-        print(f'No games log for season {season}. Creating.')
-        Path.touch(f'seasons/{season}/{GAMES}')
+    if not os.path.isfile(f'seasons/{season_name}/{GAMES}'):
+        print(f'No games log for season {season_name}. Creating.')
+        Path.touch(f'seasons/{season_name}/{GAMES}')
 
     games_saved = set()
 
-    with open(f'seasons/{season}/{GAMES}') as f:
+    with open(f'seasons/{season_name}/{GAMES}') as f:
         for line in f:
             games_saved.add(line.rstrip())
 
-    for team in teams:
+    season = Season(season_name)
+
+    for team in season.teams:
         retrieved = []
 
         if not os.path.isdir(f'seasons/{season}/{team}'):
@@ -128,15 +128,15 @@ def main():
             with open(f'seasons/{season}/{b}/{id}.json', 'w') as g:
                 g.write(json.dumps(play_by_play))
 
-            if file_count(f'seasons/{season}/{b}/') == GAMES_IN_SEASON_PER_TEAM:
+            if file_count(f'seasons/{season}/{b}/') == season.GAMES_IN_SEASON_PER_TEAM:
                 Path.touch(f'seasons/{season}/{b}/{DONE}')
 
             games_saved.add(id)
 
-        if file_count(f'seasons/{season}/{team}/') == GAMES_IN_SEASON_PER_TEAM:
+        if file_count(f'seasons/{season}/{team}/') == season.GAMES_IN_SEASON_PER_TEAM:
             Path.touch(f'seasons/{season}/{team}/{DONE}')
 
-        if all(os.path.isfile(f'seasons/{season}/{team_name}/{DONE}') for team_name in teams):
+        if all(os.path.isfile(f'seasons/{season}/{team_name}/{DONE}') for team_name in season.teams):
             Path.touch(f'seasons/{season}/{DONE}')
 
         with open(f'seasons/{season}/{GAMES}', 'w') as g:
