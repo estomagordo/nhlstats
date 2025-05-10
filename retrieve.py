@@ -16,8 +16,8 @@ def play_by_play_url(game_id):
     return f'https://api-web.nhle.com/v1/gamecenter/{game_id}/play-by-play'
 
 
-def club_schedule_season(team, season):
-    return f'https://api-web.nhle.com/v1/club-schedule-season/{team}/{season}'
+def club_schedule_season(team, season_name):
+    return f'https://api-web.nhle.com/v1/club-schedule-season/{team}/{season_name}'
 
 
 def get(url):
@@ -41,7 +41,7 @@ def get_play_by_play(id):
 
 
 def games_for_season_team(season, team):
-    content = get(club_schedule_season(team, season))
+    content = get(club_schedule_season(team, season.name))
 
     data = json.loads(content)
     games = []
@@ -105,9 +105,9 @@ def main():
     for team in season.teams:
         retrieved = []
 
-        if not os.path.isdir(f'seasons/{season}/{team}'):
-            print(f'No {season} season directory found for {team}. Creating it now.')
-            os.makedirs(f'seasons/{season}/{team}')
+        if not os.path.isdir(f'seasons/{season.name}/{team}'):
+            print(f'No {season.name} season directory found for {team}. Creating it now.')
+            os.makedirs(f'seasons/{season.name}/{team}')
 
         if not os.path.isfile(f'seasons/{season}/{team}/{DONE}'):
             for id, opponent in games_for_season_team(season, team):

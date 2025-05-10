@@ -36,9 +36,12 @@ CURRENT_TEAMS = [
 
 class Season:
     def __init__(self, name):
-        self.GAMES_IN_SEASON_PER_TEAM = 82
+        self.GAMES_IN_SEASON_PER_TEAM = 56 if name == '20202021' else 82
         self.name = name
         self.teams = self.teams_for_season()
+    
+    def __repr__(self):
+        return self.name
         
     def teams_for_season(self):
         if self.name == '20242025':
