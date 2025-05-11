@@ -60,7 +60,7 @@ def main():
                 if succcess:
                     minutes[lead_minute][result] += 1
 
-    print_stats(minutes)
+    print_stats(minutes, 'one_nil_after_one')
 
 
 if __name__ == '__main__':

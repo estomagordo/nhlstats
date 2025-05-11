@@ -1,3 +1,5 @@
+import os
+
 from matplotlib import pyplot
 
 NHL_WIN_POINTS = 2
@@ -15,17 +17,18 @@ def print_minute(minute):
     return f'Wins: {minute[0]} ({percentage(minute[0]/total)}). Draws: {minute[1]} ({percentage(minute[1]/total)}). Losses: {minute[2]} ({percentage(minute[2]/total)}). '
 
 
-def print_stats(minutes, save_to_file=False):
+def print_stats(minutes, name, save_to_file=False):
     grand_total = sum(sum(minute) for minute in minutes)
+    out = []
 
     for i, minute in enumerate(minutes):
-        print(f'Minute {i+1}: {print_minute(minute)} ({percentage(sum(minute)/grand_total)})')
+        out.append(f'Minute {i+1}: {print_minute(minute)} ({percentage(sum(minute)/grand_total)})')
 
     wins = sum(minute[0] for minute in minutes)
     draws = sum(minute[1] for minute in minutes)
     losses = sum(minute[2] for minute in minutes)
 
-    print(f'Total: {print_minute([wins, draws, losses])}')
+    out.append(f'Total: {print_minute([wins, draws, losses])}')
 
     totals = [sum(minute) for minute in minutes]
     times = [m for m in range(1, 21)]
@@ -42,4 +45,21 @@ def print_stats(minutes, save_to_file=False):
     pyplot.plot(times, shl_weighted_point_percentages, label='Weighted points SHL')
     pyplot.xticks(times)
     pyplot.legend()
-    pyplot.show()
+
+    if save_to_file:
+        if not os.path.isdir('stats'):
+            print('No seasons directory found. Creating it now.')
+            os.makedirs('stats')
+        if not os.path.isdir(f'stats/{name}'):
+            print(f'No seasons/{name} directory found. Creating it now.')
+            os.makedirs(f'stats/{name}')
+            os.makedirs(f'stats/{name}/text')
+            os.makedirs(f'stats/{name}/plots')
+
+        with open(f'stats/{name}/text/report.txt', 'w') as g:
+            g.write('\n'.join(out))
+
+        pyplot.savefig(f'stats/{name}/plots/report.png')
+    else:
+        print('\n'.join(out))
+        pyplot.show()
