@@ -33,6 +33,40 @@ CURRENT_TEAMS = [
     'WSH',
 ]
 
+FIRST_PANDEMIC_GAMES = {
+    'BOS': 70,
+    'TBL': 70,
+    'WAS': 69,
+    'PHI': 69,
+    'PIT': 69,
+    'CAR': 68,
+    'NYI': 68,
+    'TOR': 70,
+    'CBJ': 70,
+    'FLA': 69,
+    'NYR': 70,
+    'MTL': 71,
+    'BUF': 69,
+    'NJD': 69,
+    'OTT': 71,
+    'DET': 71,
+    'STL': 71,
+    'COL': 70,
+    'VGK': 71,
+    'DAL': 69,
+    'EDM': 71,
+    'NSH': 69,
+    'VAN': 69,
+    'CGY': 70,
+    'WPJ': 71,
+    'MIN': 69,
+    'ARI': 70,
+    'CHI': 70,
+    'ANA': 71,
+    'LAK': 70,
+    'SJS': 70
+}
+
 
 class Season:
     def __init__(self, name):
@@ -42,6 +76,13 @@ class Season:
     
     def __repr__(self):
         return self.name
+    
+    def games_for_team(self, team):
+        if self.name == '20202021':
+            return 56
+        if self.name == '20192020':
+            return FIRST_PANDEMIC_GAMES[team]
+        return 82
         
     def teams_for_season(self):
         if self.name == '20242025':
