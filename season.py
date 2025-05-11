@@ -36,7 +36,7 @@ CURRENT_TEAMS = [
 FIRST_PANDEMIC_GAMES = {
     'BOS': 70,
     'TBL': 70,
-    'WAS': 69,
+    'WSH': 69,
     'PHI': 69,
     'PIT': 69,
     'CAR': 68,
@@ -58,7 +58,7 @@ FIRST_PANDEMIC_GAMES = {
     'NSH': 69,
     'VAN': 69,
     'CGY': 70,
-    'WPJ': 71,
+    'WPG': 71,
     'MIN': 69,
     'ARI': 70,
     'CHI': 70,
