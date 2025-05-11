@@ -5,6 +5,7 @@ from statter import print_stats
 
 
 def process_file(file_name):
+    print(file_name)
     with open(file_name) as f:
         outcomes = [
             [-1, -1, -1, False, -1],
@@ -23,17 +24,18 @@ def process_file(file_name):
             if period > 3:
                 break
 
-            if play_type == 'period-start':
-                outcomes[period-1][0] = home
-                outcomes[period-1][1] = away
-            elif play_type == 'period-end':
-                started_tie = outcomes[period-1][0] == outcomes[period-1][1]
-                tie_broken = (home+away) - sum(outcomes[period-1][:2]) == 1
+            if period < 3:
+                if play_type == 'period-start':
+                    outcomes[period-1][0] = home
+                    outcomes[period-1][1] = away
+                elif play_type == 'period-end':
+                    started_tie = outcomes[period-1][0] == outcomes[period-1][1]
+                    tie_broken = (home+away) - sum(outcomes[period-1][:2]) == 1
 
-                if started_tie and tie_broken:
-                    outcomes[period-1][2] = last_minute_scored
-                    outcomes[period-1][3] = home > away
-            elif play_type != 'goal':
+                    if started_tie and tie_broken:
+                        outcomes[period-1][2] = last_minute_scored
+                        outcomes[period-1][3] = home > away
+            if play_type != 'goal':
                 continue
 
             last_minute_scored = int(play['timeInPeriod'].split(':')[0])
@@ -74,9 +76,9 @@ def main():
                 outcomes = process_file(os.path.join(path, file))
 
                 for i, outcome in enumerate(outcomes):
-                    success, minute, result = outcome
-                    if success:
-                        stats[i][minute][result] += 1
+                    _, _, minute, _, result = outcome
+                    if minute > -1:
+                        stats[i][1][minute][result] += 1
 
     for name, minutes in stats:
         print_stats(minutes, name, True)

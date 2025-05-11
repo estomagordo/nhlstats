@@ -48,10 +48,10 @@ def print_stats(minutes, name, save_to_file=False):
 
     if save_to_file:
         if not os.path.isdir('stats'):
-            print('No seasons directory found. Creating it now.')
+            print('No stats directory found. Creating it now.')
             os.makedirs('stats')
         if not os.path.isdir(f'stats/{name}'):
-            print(f'No seasons/{name} directory found. Creating it now.')
+            print(f'No stats/{name} directory found. Creating it now.')
             os.makedirs(f'stats/{name}')
             os.makedirs(f'stats/{name}/text')
             os.makedirs(f'stats/{name}/plots')
